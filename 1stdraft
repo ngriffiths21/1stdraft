@@ -1,0 +1,111 @@
+#!/bin/bash
+#
+# 1stdraft [filename]
+# version 0.1.0
+#
+# todo:
+# - rework so that escapes are handled recursively during read step, not with sed
+#
+####
+
+#### Setup ####
+
+BUFFER=''  # where the result is stored
+FILE="$1"
+if [ -f "$FILE" ]
+then
+	echo -n "File will be overwritten, continue anyway? (Y/n) "
+	read -n 1 ovrwrt
+	echo
+	if [ ! "$ovrwrt" = 'Y' ]
+	then
+		exit 1
+	fi
+fi
+
+echo "Welcome to 1stdraft."
+echo "As you write, backspaces will be discarded and only the last character will be displayed."
+echo -n "Writing... (press Ctrl-D to finish)"$'\n'"> "
+
+#### READ INPUT ####
+
+IFS='' # otherwise bash will delete spaces
+while true
+do
+	read -rs -d '' -N 1 output
+	if [ "$output" = $'\04' ]     # Ctrl-D -- exit input
+	then
+		echo -ne "\033[1K\r> " # erase char
+		break
+	fi
+	if [ "$output" = $'\177' ]
+	then
+		echo -ne "\033[1K\r> " # erase char
+		continue            # skip any backspaces
+	fi
+
+	if [ "$output" = $'\x1b' ] # escape sequence! will discard these
+	then
+		read -rs -d '' -N 1 brkt
+		if [ ! "$brkt" = "[" ]
+		then
+			continue      # was not a valid ANSI escape sequence
+		fi
+		while true          # continue reading chars until endcode is reached
+		do
+			read -rs -d '' -N 1 endchr
+			re="[]@A-Za-z\\^_\`{|}~]"  # \x40-\x7e EXCEPT [, which linux often uses inappropriately.
+			if [[ "$endchr" =~ $re ]]  # if one of these termination chars are reached, break.
+			then
+				break
+			fi
+		done
+		echo -ne "\033[1K\r> " # erase char
+		continue
+	fi
+	
+	BUFFER="$BUFFER$output"
+	if [ "$output" = $'\n' ]
+	then
+		output=''
+	fi
+	echo -ne "\033[2K\r" # erase char
+	echo -n "> $output"
+done
+
+#### WRITE TO FILE ####
+
+if [ -z "$FILE" ]   # get filename if not passed
+then
+	while true
+	do
+		echo "Save to file:"
+		read FILE
+		if [ ! -z "$FILE" ]
+		then
+			if [ -f "$FILE" ]
+			then
+				echo -n "Overwrite existing file? (Y/n) "
+				read -n 1 ovrwrt
+				echo
+				if [ $ovrwrt = 'Y' ]
+				then
+					break
+				fi
+				continue
+			fi
+			break
+		fi
+
+		echo -n "Discard? (Y/n) "
+		read -n 1 discard
+		echo
+		if [ $discard = 'Y' ]
+		then
+			exit 0
+		fi
+	done
+fi
+
+echo "$BUFFER" > "$FILE"
+exit 0
