@@ -1,6 +1,6 @@
 # 1stdraft
 
-1stdraft allows you to write a complete draft at the command line without losing focus. It hides all but the last typed character, preventing you from editing or re-reading as you write.
+A tool that allows you to write a complete draft at the command line without losing focus. It hides all but the last typed character, preventing you from editing or re-reading as you write.
 
 ## Usage
 
@@ -10,13 +10,14 @@
 
 Download the script, update permissions and `PATH`:
 ```bash
-curl https://raw.githubusercontent.com/ngriffiths21/1stdraft/master/1stdraft > ~/.1stdraft/1stdraft
-chmod a+x ~/.1stdraft/1stdraft
+mkdir ~/.1stdraft && \
+curl https://raw.githubusercontent.com/ngriffiths21/1stdraft/master/1stdraft > ~/.1stdraft/1stdraft && \
+chmod a+x ~/.1stdraft/1stdraft && \
 echo 'export PATH="~/.1stdraft/:$PATH"' >> ~/.bash_profile
 ```
 or if you have a user-specific `bin`:
 ```bash
-curl https://raw.githubusercontent.com/ngriffiths21/1stdraft/master/1stdraft > ~/bin/1stdraft
+curl https://raw.githubusercontent.com/ngriffiths21/1stdraft/master/1stdraft > ~/bin/1stdraft && \
 chmod a+x ~/bin/1stdraft
 ```
 
