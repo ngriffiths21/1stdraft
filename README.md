@@ -1,12 +1,14 @@
 # 1stdraft
 
-1stdraft allows you to write a complete draft without losing focus. It is a command-line tool that hides all but the last typed character, preventing you from editing or re-reading as you write.
+1stdraft allows you to write a complete draft at the command line without losing focus. It hides all but the last typed character, preventing you from editing or re-reading as you write.
 
 ## Usage
 
+1stdraft runs in a Bash shell.
+
 ### Install
 
-Download the Bash script and update `PATH`:
+Download the script, update permissions and `PATH`:
 ```bash
 curl https://raw.githubusercontent.com/ngriffiths21/1stdraft/master/1stdraft > ~/.1stdraft/1stdraft
 chmod a+x ~/.1stdraft/1stdraft
