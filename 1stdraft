@@ -25,6 +25,11 @@ fi
 
 echo "Welcome to 1stdraft."
 echo "As you write, backspaces will be discarded and only the last character will be displayed."
+
+FDTEMP="$(mktemp)"
+
+echo "Creating recovery file ${FDTEMP}; check here if something goes wrong."
+
 echo -n "Writing... (press Ctrl-D to finish)"$'\n'"> "
 
 #### READ INPUT ####
@@ -65,9 +70,11 @@ do
 	fi
 	
 	BUFFER="$BUFFER$output"
+
 	if [ "$output" = $'\n' ]
 	then
 		output=''
+		echo "$BUFFER" > "$FDTEMP"  # save temp on every newline
 	fi
 	echo -ne "\033[2K\r" # erase char
 	echo -n "> $output"
@@ -75,6 +82,7 @@ done
 
 #### WRITE TO FILE ####
 
+echo "$BUFFER" > "$FDTEMP"
 if [ -z "$FILE" ]   # get filename if not passed
 then
 	while true
@@ -107,5 +115,5 @@ then
 	done
 fi
 
-echo "$BUFFER" > "$FILE"
+install -Dv "$FDTEMP" "$FILE" && rm "$FDTEMP"  # rm recovery if save succeeded
 exit 0
